@@ -1,0 +1,29 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+max_line_length = 120
+tab_width = 4
+trim_trailing_whitespace = true
+
+[*.java]
+ij_java_blank_lines_around_field = 0
+ij_java_blank_lines_after_imports = 1
+ij_java_blank_lines_after_package = 1
+ij_java_blank_lines_around_class = 1
+ij_java_blank_lines_before_class_end = 1
+ij_java_blank_lines_after_class_header = 1
+ij_java_blank_lines_before_package = 1
+ij_java_space_before_do_left_brace = true
+ij_java_space_before_else_keyword = true
+ij_java_space_before_else_left_brace = true
+ij_java_space_before_for_left_brace = true
+ij_java_space_before_for_parentheses = true
+ij_java_space_before_for_semicolon = false
+ij_java_space_before_while_keyword = true
+ij_java_space_before_while_left_brace = true
+ij_java_space_before_while_parentheses = true
