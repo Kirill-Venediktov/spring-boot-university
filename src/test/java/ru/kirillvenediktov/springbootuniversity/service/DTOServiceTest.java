@@ -2,17 +2,15 @@ package ru.kirillvenediktov.springbootuniversity.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.kirillvenediktov.springbootuniversity.dao.CoursesDAO;
-import ru.kirillvenediktov.springbootuniversity.dao.GroupsDAO;
 import ru.kirillvenediktov.springbootuniversity.dto.CourseDTO;
 import ru.kirillvenediktov.springbootuniversity.dto.GroupDTO;
 import ru.kirillvenediktov.springbootuniversity.dto.StudentDTO;
 import ru.kirillvenediktov.springbootuniversity.models.Course;
 import ru.kirillvenediktov.springbootuniversity.models.Group;
 import ru.kirillvenediktov.springbootuniversity.models.Student;
+import ru.kirillvenediktov.springbootuniversity.repositories.GroupRepository;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -20,16 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class DTOServiceTest {
 
     @MockBean
-    private GroupsDAO groupsDAO;
-
-    @MockBean
-    private CoursesDAO coursesDAO;
+    private GroupRepository groupRepository;
 
     private DTOService dtoService;
 
     @BeforeEach
     public void init() {
-        dtoService = new DTOService(groupsDAO, coursesDAO);
+        dtoService = new DTOService(groupRepository);
     }
 
     @Test

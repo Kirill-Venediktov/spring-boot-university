@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.kirillvenediktov.springbootuniversity.dao.GroupsDAO;
-import ru.kirillvenediktov.springbootuniversity.dto.GroupDTO;
-import ru.kirillvenediktov.springbootuniversity.models.Group;
+import ru.kirillvenediktov.springbootuniversity.repositories.GroupRepository;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -15,19 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class GroupsServiceTest {
 
     private GroupsService groupsService;
+
     @MockBean
-    private GroupsDAO groupsDAO;
+    private GroupRepository groupRepository;
+
     @MockBean
     private DTOService dtoService;
 
     @BeforeEach
     public void init() {
-        groupsService = new GroupsService(groupsDAO, dtoService);
-    }
-
-    @Test
-    void getGroupsWithStudentCount_shouldReturnListOfGroupsWithStudentsCount() {
-        assertNotNull(groupsService.getGroupsWithStudentCount());
+        groupsService = new GroupsService(groupRepository, dtoService);
     }
 
     @Test
@@ -36,10 +31,13 @@ class GroupsServiceTest {
     }
 
     @Test
-    void getGroup_shouldReturnGroupDTO_whenInputIsGroupId() {
-        Mockito.when(groupsDAO.getGroup(Mockito.anyLong())).thenReturn(new Group());
-        Mockito.when(dtoService.getGroupDTO(Mockito.any())).thenReturn(new GroupDTO());
+    void getGroup_shouldReturnGroup_whenInputIsGroupId() {
         assertNotNull(groupsService.getGroup(Mockito.anyLong()));
+    }
+
+    @Test
+    void getStudentsOfGroup_shouldReturnListOfStudentsDTO_whenInputIsGroupId() {
+        assertNotNull(groupsService.getStudentsOfGroup(Mockito.anyLong()));
     }
 
 }

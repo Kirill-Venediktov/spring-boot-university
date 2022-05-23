@@ -3,6 +3,7 @@ package ru.kirillvenediktov.springbootuniversity.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,8 +54,8 @@ public class CoursesController {
                              @RequestParam("size") Optional<Integer> size) {
         int currentPage = page.orElse(CURRENT_PAGE_NUMBER);
         int pageSize = size.orElse(PAGE_SIZE);
-        Page<CourseDTO> coursePage = paginationService.getPage(
-            PageRequest.of(currentPage - 1, pageSize), coursesService.getAllCourses());
+        Page<CourseDTO> coursePage = coursesService.getCoursesPage(
+            PageRequest.of(currentPage - 1, pageSize, Sort.by("id")));
         model.addAttribute(MODEL_OF_COURSE_PAGE, coursePage);
         model.addAttribute(MODEL_OF_PAGE_NUMBERS, paginationService.getPageNumbers(coursePage));
         return "courses";
@@ -66,7 +67,7 @@ public class CoursesController {
                                 @RequestParam("size") Optional<Integer> size) {
         int currentPage = page.orElse(CURRENT_PAGE_NUMBER);
         int pageSize = size.orElse(PAGE_SIZE);
-        CourseDTO course = coursesService.getCourse(id);
+        CourseDTO course = coursesService.getCourseDTO(id);
         model.addAttribute(MODEL_OF_COURSE, course);
         Page<StudentDTO> studentPage = paginationService.getPage(
             PageRequest.of(currentPage - 1, pageSize), coursesService.getStudentsOfCourse(id));
@@ -109,7 +110,7 @@ public class CoursesController {
 
     @GetMapping("/editCourse/{id}")
     public String getEditCourseForm(@PathVariable("id") Long id, Model model) {
-        CourseDTO course = coursesService.getCourse(id);
+        CourseDTO course = coursesService.getCourseDTO(id);
         model.addAttribute(MODEL_OF_COURSE, course);
         return "editCourse";
     }
@@ -122,13 +123,15 @@ public class CoursesController {
 
     @PostMapping("/addCourse/{id}")
     public String addToCourse(@PathVariable("id") Long id, @ModelAttribute("course") CourseDTO course) {
-        coursesService.addStudentToCourse(id, course.getId());
+        StudentDTO studentDTO = studentsService.getStudentDTO(id);
+        coursesService.addStudentToCourse(studentDTO, course.getId());
         return "redirect:/students/{id}";
     }
 
     @PostMapping("/deleteStudentFromCourse/{id}")
     public String deleteFromCourse(@PathVariable("id") Long id, @ModelAttribute(MODEL_OF_COURSE) CourseDTO course) {
-        coursesService.removeStudentFromCourse(id, course.getId());
+        StudentDTO studentDTO = studentsService.getStudentDTO(id);
+        coursesService.removeStudentFromCourse(studentDTO, course.getId());
         return "redirect:/students/{id}";
     }
 
