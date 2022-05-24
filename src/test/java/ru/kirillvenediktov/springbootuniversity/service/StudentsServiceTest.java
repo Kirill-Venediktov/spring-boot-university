@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.kirillvenediktov.springbootuniversity.dao.StudentsDAO;
 import ru.kirillvenediktov.springbootuniversity.dto.StudentDTO;
-import ru.kirillvenediktov.springbootuniversity.models.Student;
+import ru.kirillvenediktov.springbootuniversity.repositories.GroupRepository;
+import ru.kirillvenediktov.springbootuniversity.repositories.StudentRepository;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -16,13 +16,20 @@ class StudentsServiceTest {
 
     private StudentsService studentsService;
     @MockBean
-    private StudentsDAO studentsDAO;
+    private StudentRepository studentRepository;
+    @MockBean
+    private GroupRepository groupRepository;
     @MockBean
     private DTOService dtoService;
 
     @BeforeEach
     public void init() {
-        studentsService = new StudentsService(studentsDAO, dtoService);
+        studentsService = new StudentsService(studentRepository, groupRepository, dtoService);
+    }
+
+    @Test
+    void getStudent_shouldReturnStudent_whenInputIsStudentId() {
+        assertNotNull(studentsService.getStudent(Mockito.anyLong()));
     }
 
     @Test
@@ -31,15 +38,9 @@ class StudentsServiceTest {
     }
 
     @Test
-    void getAllStudents_shouldReturnListOfStudentsDTO() {
-        assertNotNull(studentsService.getAllStudents());
-    }
-
-    @Test
-    void getStudent_shouldReturnStudentDTO() {
-        Mockito.when(studentsDAO.getStudent(Mockito.anyLong())).thenReturn(new Student());
+    void getStudentDTO_shouldReturnStudentDTO() {
         Mockito.when(dtoService.getStudentDTO(Mockito.any())).thenReturn(new StudentDTO());
-        assertNotNull(studentsService.getStudent(Mockito.anyLong()));
+        assertNotNull(studentsService.getStudentDTO(Mockito.anyLong()));
     }
 
 }

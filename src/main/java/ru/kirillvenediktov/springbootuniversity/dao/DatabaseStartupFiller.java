@@ -15,7 +15,6 @@ import javax.persistence.EntityTransaction;
 import javax.sql.DataSource;
 import java.util.List;
 
-
 public class DatabaseStartupFiller {
 
     private static final int BATCH_SIZE = 10;

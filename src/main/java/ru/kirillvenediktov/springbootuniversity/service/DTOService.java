@@ -2,8 +2,6 @@ package ru.kirillvenediktov.springbootuniversity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.kirillvenediktov.springbootuniversity.dao.CoursesDAO;
-import ru.kirillvenediktov.springbootuniversity.dao.GroupsDAO;
 import ru.kirillvenediktov.springbootuniversity.dto.CourseDTO;
 import ru.kirillvenediktov.springbootuniversity.dto.GroupDTO;
 import ru.kirillvenediktov.springbootuniversity.dto.GroupWithStudentCount;
@@ -11,17 +9,19 @@ import ru.kirillvenediktov.springbootuniversity.dto.StudentDTO;
 import ru.kirillvenediktov.springbootuniversity.models.Course;
 import ru.kirillvenediktov.springbootuniversity.models.Group;
 import ru.kirillvenediktov.springbootuniversity.models.Student;
+import ru.kirillvenediktov.springbootuniversity.repositories.GroupRepository;
+
+import java.util.HashSet;
+import java.util.Optional;
 
 @Service
 public class DTOService {
 
-    private final GroupsDAO groupsDAO;
-    private final CoursesDAO coursesDAO;
+    private final GroupRepository groupRepository;
 
     @Autowired
-    public DTOService(GroupsDAO groupsDAO, CoursesDAO coursesDAO) {
-        this.groupsDAO = groupsDAO;
-        this.coursesDAO = coursesDAO;
+    public DTOService(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
     }
 
     public StudentDTO getStudentDTO(Student student) {
@@ -29,6 +29,8 @@ public class DTOService {
         studentDTO.setId(student.getId());
         if (student.getGroup() != null) {
             studentDTO.setGroupId(student.getGroup().getId());
+        } else {
+            studentDTO.setGroupId(0L);
         }
         studentDTO.setFirstName(student.getFirstName());
         studentDTO.setLastName(student.getLastName());
@@ -63,10 +65,15 @@ public class DTOService {
         if (studentDTO.getId() != null) {
             student.setId(studentDTO.getId());
         }
-        student.setGroup(groupsDAO.getGroup(studentDTO.getGroupId()));
+        Optional<Group> optionalGroup = groupRepository.findById(studentDTO.getGroupId());
+        Group group = new Group();
+        if (optionalGroup.isPresent()) {
+            group = optionalGroup.get();
+        }
+        student.setGroup(group);
         student.setFirstName(studentDTO.getFirstName());
         student.setLastName(studentDTO.getLastName());
-        student.setCourses(coursesDAO.getStudentCourses(student));
+        student.setCourses(new HashSet<>());
         return student;
     }
 

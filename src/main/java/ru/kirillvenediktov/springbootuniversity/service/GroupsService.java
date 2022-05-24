@@ -1,43 +1,47 @@
 package ru.kirillvenediktov.springbootuniversity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kirillvenediktov.springbootuniversity.dao.GroupsDAO;
 import ru.kirillvenediktov.springbootuniversity.dto.GroupDTO;
 import ru.kirillvenediktov.springbootuniversity.dto.GroupWithStudentCount;
 import ru.kirillvenediktov.springbootuniversity.dto.StudentDTO;
 import ru.kirillvenediktov.springbootuniversity.models.Group;
 import ru.kirillvenediktov.springbootuniversity.models.Student;
+import ru.kirillvenediktov.springbootuniversity.repositories.GroupRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GroupsService {
 
-    private final GroupsDAO groupsDAO;
+    private final GroupRepository groupRepository;
     private final DTOService dtoService;
 
     @Autowired
-    public GroupsService(GroupsDAO groupsDAO, DTOService dtoService) {
-        this.groupsDAO = groupsDAO;
+    public GroupsService(GroupRepository groupRepository, DTOService dtoService) {
+        this.groupRepository = groupRepository;
         this.dtoService = dtoService;
     }
 
     @Transactional
-    public List<GroupWithStudentCount> getGroupsWithStudentCount() {
-        List<Group> groups = groupsDAO.getAllGroups();
-        List<GroupWithStudentCount> groupWithStudentCounts = new ArrayList<>();
+    public Page<GroupWithStudentCount> getGroupsPage(Pageable pageable) {
+        Page<Group> groups = groupRepository.findAll(pageable);
+        List<GroupWithStudentCount> groupDTOS = new ArrayList<>();
         for (Group group : groups) {
-            groupWithStudentCounts.add(dtoService.getGroupWithStudentCountDTO(group));
+            groupDTOS.add(dtoService.getGroupWithStudentCountDTO(group));
         }
-        return groupWithStudentCounts;
+        return new PageImpl<>(groupDTOS, pageable, groupRepository.findAll().size());
     }
 
     @Transactional
     public List<GroupDTO> getAllGroups() {
-        List<Group> groups = groupsDAO.getAllGroups();
+        List<Group> groups = groupRepository.findAll();
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for (Group group : groups) {
             groupDTOS.add(dtoService.getGroupDTO(group));
@@ -46,30 +50,41 @@ public class GroupsService {
     }
 
     @Transactional
-    public GroupDTO getGroup(Long groupId) {
-        Group group = groupsDAO.getGroup(groupId);
-        return dtoService.getGroupDTO(group);
+    public Group getGroup(Long groupId) {
+        Optional<Group> optionalGroup = groupRepository.findById(groupId);
+        Group group = new Group();
+        if (optionalGroup.isPresent()) {
+            group = optionalGroup.get();
+        }
+        return group;
+    }
+
+    @Transactional
+    public GroupDTO getGroupDTO(Long groupId) {
+        return dtoService.getGroupDTO(getGroup(groupId));
     }
 
     @Transactional
     public void deleteGroup(Long groupId) {
-        Group group = groupsDAO.getGroup(groupId);
-        groupsDAO.deleteGroup(group);
+        Group group = getGroup(groupId);
+        groupRepository.delete(group);
     }
 
     @Transactional
     public void saveGroup(GroupDTO groupDTO) {
-        Group group = dtoService.getGroup(groupDTO);
-        if (group.getId() == null) {
-            groupsDAO.createGroup(group);
+        Group group;
+        if (groupDTO.getId() == null) {
+            group = dtoService.getGroup(groupDTO);
+            groupRepository.save(group);
         } else {
-            groupsDAO.updateGroup(group);
+            group = getGroup(groupDTO.getId());
+            group.setGroupName(groupDTO.getGroupName());
         }
     }
 
     @Transactional
     public List<StudentDTO> getStudentsOfGroup(Long groupId) {
-        Group group = groupsDAO.getGroup(groupId);
+        Group group = getGroup(groupId);
         List<Student> students = group.getStudents();
         List<StudentDTO> studentDTOS = new ArrayList<>();
         for (Student student : students) {

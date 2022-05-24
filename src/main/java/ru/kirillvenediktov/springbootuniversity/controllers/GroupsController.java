@@ -3,6 +3,7 @@ package ru.kirillvenediktov.springbootuniversity.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,9 +48,8 @@ public class GroupsController {
                             @RequestParam("size") Optional<Integer> size) {
         int currentPage = page.orElse(CURRENT_PAGE_NUMBER);
         int pageSize = size.orElse(PAGE_SIZE);
-        Page<GroupWithStudentCount> groupPage = paginationService.getPage(
-            PageRequest.of(currentPage - 1, pageSize), groupsService.getGroupsWithStudentCount()
-        );
+        Page<GroupWithStudentCount> groupPage = groupsService.getGroupsPage(
+            PageRequest.of(currentPage - 1, pageSize, Sort.by("id")));
         model.addAttribute(MODEL_OF_GROUP_PAGE, groupPage);
         int totalPages = groupPage.getTotalPages();
         if (totalPages > 0) {
@@ -65,7 +65,7 @@ public class GroupsController {
                                @RequestParam("size") Optional<Integer> size) {
         int currentPage = page.orElse(CURRENT_PAGE_NUMBER);
         int pageSize = size.orElse(PAGE_SIZE);
-        GroupDTO group = groupsService.getGroup(id);
+        GroupDTO group = groupsService.getGroupDTO(id);
         model.addAttribute(MODEL_OF_GROUP, group);
         Page<StudentDTO> studentPage = paginationService.getPage(
             PageRequest.of(currentPage - 1, pageSize), groupsService.getStudentsOfGroup(id));
@@ -83,7 +83,7 @@ public class GroupsController {
 
     @GetMapping("/editGroup/{id}")
     public String getEditGroupForm(@PathVariable("id") Long id, Model model) {
-        GroupDTO group = groupsService.getGroup(id);
+        GroupDTO group = groupsService.getGroupDTO(id);
         model.addAttribute(MODEL_OF_GROUP, group);
         return "editGroup";
     }

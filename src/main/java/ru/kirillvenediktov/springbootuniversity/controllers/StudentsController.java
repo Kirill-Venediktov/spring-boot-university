@@ -3,6 +3,7 @@ package ru.kirillvenediktov.springbootuniversity.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.kirillvenediktov.springbootuniversity.dto.GroupDTO;
 import ru.kirillvenediktov.springbootuniversity.dto.StudentDTO;
 import ru.kirillvenediktov.springbootuniversity.service.GroupsService;
-import ru.kirillvenediktov.springbootuniversity.service.PaginationService;
 import ru.kirillvenediktov.springbootuniversity.service.StudentsService;
 
 import java.util.List;
@@ -34,17 +34,14 @@ public class StudentsController {
     private static final int CURRENT_PAGE_NUMBER = 1;
     private static final int PAGE_SIZE = 10;
 
-
     private final StudentsService studentsService;
     private final GroupsService groupsService;
-    private final PaginationService paginationService;
 
     @Autowired
-    public StudentsController(StudentsService studentsService, GroupsService groupsService,
-                              PaginationService paginationService) {
+    public StudentsController(StudentsService studentsService, GroupsService groupsService) {
         this.studentsService = studentsService;
         this.groupsService = groupsService;
-        this.paginationService = paginationService;
+
     }
 
     @GetMapping("/students")
@@ -53,8 +50,8 @@ public class StudentsController {
                               @RequestParam("size") Optional<Integer> size) {
         int currentPage = page.orElse(CURRENT_PAGE_NUMBER);
         int pageSize = size.orElse(PAGE_SIZE);
-        Page<StudentDTO> studentPage = paginationService.getPage(
-            PageRequest.of(currentPage - 1, pageSize), studentsService.getAllStudents());
+        Page<StudentDTO> studentPage = studentsService.getStudentPage(
+            PageRequest.of(currentPage - 1, pageSize, Sort.by("id")));
         model.addAttribute(MODEL_OF_STUDENT_PAGE, studentPage);
         int totalPages = studentPage.getTotalPages();
         if (totalPages > 0) {
@@ -76,8 +73,8 @@ public class StudentsController {
 
     @GetMapping("/editStudent/{id}")
     public String getEditStudentForm(@PathVariable("id") Long id, Model model) {
-        StudentDTO student = studentsService.getStudent(id);
-        GroupDTO group = groupsService.getGroup(student.getGroupId());
+        StudentDTO student = studentsService.getStudentDTO(id);
+        GroupDTO group = groupsService.getGroupDTO(student.getGroupId());
         model.addAttribute(MODEL_OF_STUDENT, student);
         model.addAttribute(MODEL_OF_GROUP, group);
         List<GroupDTO> groups = groupsService.getAllGroups();
@@ -87,10 +84,10 @@ public class StudentsController {
 
     @GetMapping("/students/{id}")
     public String getStudentInfo(@PathVariable("id") Long id, Model model) {
-        StudentDTO student = studentsService.getStudent(id);
+        StudentDTO student = studentsService.getStudentDTO(id);
         GroupDTO group = new GroupDTO();
         if (student.getGroupId() != null) {
-            group = groupsService.getGroup(student.getGroupId());
+            group = groupsService.getGroupDTO(student.getGroupId());
         }
         model.addAttribute(MODEL_OF_STUDENT, student);
         model.addAttribute(MODEL_OF_GROUP, group);

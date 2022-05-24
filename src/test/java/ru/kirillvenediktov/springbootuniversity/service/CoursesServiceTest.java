@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.kirillvenediktov.springbootuniversity.dao.CoursesDAO;
-import ru.kirillvenediktov.springbootuniversity.dao.StudentsDAO;
 import ru.kirillvenediktov.springbootuniversity.dto.CourseDTO;
-import ru.kirillvenediktov.springbootuniversity.models.Course;
+import ru.kirillvenediktov.springbootuniversity.repositories.CourseRepository;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -16,19 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class CoursesServiceTest {
 
     @MockBean
-    private CoursesDAO coursesDAO;
+    private CourseRepository courseRepository;
+
+    @MockBean
+    private StudentsService studentsService;
 
     @MockBean
     private DTOService dtoService;
-
-    @MockBean
-    private StudentsDAO studentsDAO;
 
     private CoursesService coursesService;
 
     @BeforeEach
     public void init() {
-        coursesService = new CoursesService(coursesDAO, dtoService, studentsDAO);
+        coursesService = new CoursesService(courseRepository, studentsService, dtoService);
     }
 
     @Test
@@ -42,10 +40,9 @@ class CoursesServiceTest {
     }
 
     @Test
-    void getCourse_shouldReturnCourseDTO_whenInputIsCourseId() {
-        Mockito.when(coursesDAO.getCourse(Mockito.anyLong())).thenReturn(new Course());
+    void getCourseDTO_shouldReturnCourseDTO_whenInputIsCourseId() {
         Mockito.when(dtoService.getCourseDTO(Mockito.any())).thenReturn(new CourseDTO());
-        assertNotNull(coursesService.getCourse(Mockito.anyLong()));
+        assertNotNull(coursesService.getCourseDTO(Mockito.anyLong()));
     }
 
 }
