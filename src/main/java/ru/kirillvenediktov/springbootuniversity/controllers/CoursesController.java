@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import ru.kirillvenediktov.springbootuniversity.service.CoursesService;
 import ru.kirillvenediktov.springbootuniversity.service.PaginationService;
 import ru.kirillvenediktov.springbootuniversity.service.StudentsService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ public class CoursesController {
     private static final String MODEL_OF_STUDENT_PAGE = "studentPage";
     private static final String MODEL_OF_PAGE_NUMBERS = "pageNumbers";
     private static final String REDIRECTED_COURSES_PAGE = "redirect:/courses";
+    private static final String EDIT_COURSE_PAGE = "editCourse";
     private static final int CURRENT_PAGE_NUMBER = 1;
     private static final int PAGE_SIZE = 10;
 
@@ -105,18 +108,21 @@ public class CoursesController {
     public String getAddCourseForm(Model model) {
         CourseDTO course = new CourseDTO();
         model.addAttribute(MODEL_OF_COURSE, course);
-        return "editCourse";
+        return EDIT_COURSE_PAGE;
     }
 
     @GetMapping("/editCourse/{id}")
     public String getEditCourseForm(@PathVariable("id") Long id, Model model) {
         CourseDTO course = coursesService.getCourseDTO(id);
         model.addAttribute(MODEL_OF_COURSE, course);
-        return "editCourse";
+        return EDIT_COURSE_PAGE;
     }
 
     @PostMapping("/saveCourse")
-    public String saveCourse(@ModelAttribute(MODEL_OF_COURSE) CourseDTO course) {
+    public String saveCourse(@ModelAttribute(MODEL_OF_COURSE) @Valid CourseDTO course, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return EDIT_COURSE_PAGE;
+        }
         coursesService.saveCourse(course);
         return REDIRECTED_COURSES_PAGE;
     }

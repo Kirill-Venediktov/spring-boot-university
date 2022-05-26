@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import ru.kirillvenediktov.springbootuniversity.dto.StudentDTO;
 import ru.kirillvenediktov.springbootuniversity.service.GroupsService;
 import ru.kirillvenediktov.springbootuniversity.service.PaginationService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ public class GroupsController {
     private static final String MODEL_OF_STUDENT_PAGE = "studentPage";
     private static final String MODEL_OF_PAGE_NUMBERS = "pageNumbers";
     private static final String REDIRECTED_GROUPS_PAGE = "redirect:/groups";
+    private static final String EDIT_GROUP_PAGE = "editGroup";
     private static final int CURRENT_PAGE_NUMBER = 1;
     private static final int PAGE_SIZE = 10;
 
@@ -78,14 +81,14 @@ public class GroupsController {
     public String getAddGroupForm(Model model) {
         GroupDTO group = new GroupDTO();
         model.addAttribute(MODEL_OF_GROUP, group);
-        return "editGroup";
+        return EDIT_GROUP_PAGE;
     }
 
     @GetMapping("/editGroup/{id}")
     public String getEditGroupForm(@PathVariable("id") Long id, Model model) {
         GroupDTO group = groupsService.getGroupDTO(id);
         model.addAttribute(MODEL_OF_GROUP, group);
-        return "editGroup";
+        return EDIT_GROUP_PAGE;
     }
 
     @PostMapping("/groups/{id}")
@@ -95,7 +98,10 @@ public class GroupsController {
     }
 
     @PostMapping("/saveGroup")
-    public String saveGroup(@ModelAttribute(MODEL_OF_GROUP) GroupDTO group) {
+    public String saveGroup(@ModelAttribute(MODEL_OF_GROUP) @Valid GroupDTO group, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return EDIT_GROUP_PAGE;
+        }
         groupsService.saveGroup(group);
         return REDIRECTED_GROUPS_PAGE;
     }
