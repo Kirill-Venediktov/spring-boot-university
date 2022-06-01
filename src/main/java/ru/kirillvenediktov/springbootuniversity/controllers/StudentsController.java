@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import ru.kirillvenediktov.springbootuniversity.dto.StudentDTO;
 import ru.kirillvenediktov.springbootuniversity.service.GroupsService;
 import ru.kirillvenediktov.springbootuniversity.service.StudentsService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +33,7 @@ public class StudentsController {
     private static final String MODEL_OF_GROUPS_LIST = "groupsList";
     private static final String MODEL_OF_COURSES_LIST = "coursesList";
     private static final String REDIRECTED_STUDENTS_PAGE = "redirect:/students";
+    private static final String EDIT_STUDENT_PAGE = "editStudent";
     private static final int CURRENT_PAGE_NUMBER = 1;
     private static final int PAGE_SIZE = 10;
 
@@ -68,7 +71,7 @@ public class StudentsController {
         model.addAttribute(MODEL_OF_STUDENT, student);
         model.addAttribute(MODEL_OF_GROUP, group);
         model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroups());
-        return "editStudent";
+        return EDIT_STUDENT_PAGE;
     }
 
     @GetMapping("/editStudent/{id}")
@@ -77,9 +80,8 @@ public class StudentsController {
         GroupDTO group = groupsService.getGroupDTO(student.getGroupId());
         model.addAttribute(MODEL_OF_STUDENT, student);
         model.addAttribute(MODEL_OF_GROUP, group);
-        List<GroupDTO> groups = groupsService.getAllGroups();
-        model.addAttribute(MODEL_OF_GROUPS_LIST, groups);
-        return "editStudent";
+        model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroups());
+        return EDIT_STUDENT_PAGE;
     }
 
     @GetMapping("/students/{id}")
@@ -102,7 +104,13 @@ public class StudentsController {
     }
 
     @PostMapping("/saveStudent")
-    public String saveStudent(@ModelAttribute(MODEL_OF_STUDENT) StudentDTO studentDTO) {
+    public String saveStudent(@ModelAttribute(MODEL_OF_STUDENT) @Valid StudentDTO studentDTO,
+                              BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute(MODEL_OF_STUDENT, studentDTO);
+            model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroups());
+            return EDIT_STUDENT_PAGE;
+        }
         studentsService.saveStudent(studentDTO);
         return REDIRECTED_STUDENTS_PAGE;
     }

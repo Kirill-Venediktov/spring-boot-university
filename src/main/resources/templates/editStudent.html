@@ -51,6 +51,14 @@
                     <div class="col"><input class="form-control" type="text" th:field="*{lastName}"
                                             id="lastName">
                     </div>
+                    <div style="color: red" th:switch="${#fields.hasErrors('firstName')}">
+                        <p th:case="true" th:errors="*{firstName}"></p>
+                        <p th:case="*"></p>
+                    </div>
+                    <div style="color: red" th:switch="${#fields.hasErrors('lastName')}">
+                        <p th:case="true" th:errors="*{lastName}"></p>
+                        <p th:case="*"></p>
+                    </div>
                     <div class="col">
                         <label for="group" class="form-label">Select group:</label>
                     </div>

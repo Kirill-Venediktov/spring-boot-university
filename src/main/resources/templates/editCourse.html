@@ -51,6 +51,14 @@
                                             id="courseName"></div>
                     <div class="col"><input class="form-control" type="text" th:field="*{courseDescription}"
                                             id="courseDescription"></div>
+                    <div style="color: red" th:switch="${#fields.hasErrors('courseName')}">
+                        <p th:case="true" th:errors="*{courseName}"></p>
+                        <p th:case="*"></p>
+                    </div>
+                    <div style="color: red" th:switch="${#fields.hasErrors('courseDescription')}">
+                        <p th:case="true" th:errors="*{courseDescription}"></p>
+                        <p th:case="*"></p>
+                    </div>
                     <div class="col">
                         <button type="submit" class="btn btn-primary mt-2">Submit</button>
                     </div>
