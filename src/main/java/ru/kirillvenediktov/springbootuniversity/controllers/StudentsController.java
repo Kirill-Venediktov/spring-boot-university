@@ -70,7 +70,7 @@ public class StudentsController {
         GroupDTO group = new GroupDTO();
         model.addAttribute(MODEL_OF_STUDENT, student);
         model.addAttribute(MODEL_OF_GROUP, group);
-        model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroups());
+        model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroupsDTO());
         return EDIT_STUDENT_PAGE;
     }
 
@@ -80,7 +80,7 @@ public class StudentsController {
         GroupDTO group = groupsService.getGroupDTO(student.getGroupId());
         model.addAttribute(MODEL_OF_STUDENT, student);
         model.addAttribute(MODEL_OF_GROUP, group);
-        model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroups());
+        model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroupsDTO());
         return EDIT_STUDENT_PAGE;
     }
 
@@ -108,7 +108,7 @@ public class StudentsController {
                               BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute(MODEL_OF_STUDENT, studentDTO);
-            model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroups());
+            model.addAttribute(MODEL_OF_GROUPS_LIST, groupsService.getAllGroupsDTO());
             return EDIT_STUDENT_PAGE;
         }
         studentsService.saveStudent(studentDTO);

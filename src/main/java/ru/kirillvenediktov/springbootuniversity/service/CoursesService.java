@@ -69,7 +69,7 @@ public class CoursesService {
     }
 
     @Transactional
-    public List<CourseDTO> getAllCourses() {
+    public List<CourseDTO> getAllCoursesDTO() {
         List<Course> courses = courseRepository.findAll();
         List<CourseDTO> courseDTOS = new ArrayList<>();
         for (Course course : courses) {

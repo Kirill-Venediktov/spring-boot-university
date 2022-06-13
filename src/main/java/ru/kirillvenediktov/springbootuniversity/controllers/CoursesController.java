@@ -86,7 +86,7 @@ public class CoursesController {
     @GetMapping("/addToCourse/{id}")
     public String getAddToCourseForm(@PathVariable("id") Long id, Model model) {
         Course course = new Course();
-        List<CourseDTO> courseList = coursesService.getAllCourses();
+        List<CourseDTO> courseList = coursesService.getAllCoursesDTO();
         courseList.removeAll(studentsService.getStudentCourses(id));
         model.addAttribute(MODEL_OF_STUDENT_ID, id);
         model.addAttribute(MODEL_OF_COURSE, course);

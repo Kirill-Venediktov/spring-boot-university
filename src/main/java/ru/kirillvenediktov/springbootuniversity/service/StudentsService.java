@@ -64,6 +64,16 @@ public class StudentsService {
     }
 
     @Transactional
+    public List<StudentDTO> getAllStudentsDTO() {
+        List<Student> students = studentRepository.findAll();
+        List<StudentDTO> studentDTOS = new ArrayList<>();
+        for (Student student : students) {
+            studentDTOS.add(dtoService.getStudentDTO(student));
+        }
+        return studentDTOS;
+    }
+
+    @Transactional
     public Page<StudentDTO> getStudentPage(Pageable pageable) {
         Page<Student> students = studentRepository.findAll(pageable);
         List<StudentDTO> studentDTOS = new ArrayList<>();

@@ -40,7 +40,7 @@ public class GroupsService {
     }
 
     @Transactional
-    public List<GroupDTO> getAllGroups() {
+    public List<GroupDTO> getAllGroupsDTO() {
         List<Group> groups = groupRepository.findAll();
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for (Group group : groups) {
