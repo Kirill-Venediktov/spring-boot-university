@@ -36,7 +36,7 @@ class CoursesServiceTest {
 
     @Test
     void getAllCourses_shouldReturnListOfCoursesDTO() {
-        assertNotNull(coursesService.getAllCourses());
+        assertNotNull(coursesService.getAllCoursesDTO());
     }
 
     @Test

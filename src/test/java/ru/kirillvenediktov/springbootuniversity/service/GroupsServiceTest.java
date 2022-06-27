@@ -27,7 +27,7 @@ class GroupsServiceTest {
 
     @Test
     void getAllGroups_shouldReturnGroupsDTOList() {
-        assertNotNull(groupsService.getAllGroups());
+        assertNotNull(groupsService.getAllGroupsDTO());
     }
 
     @Test
